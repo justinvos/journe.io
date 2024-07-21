@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { createEditor } from "slate";
 import { BaseEditor, Descendant } from "slate";
 import { Slate, Editable, ReactEditor, withReact } from "slate-react";
+import { useLocalStorageEntry } from "./useLocalStorageEntry";
 
 type CustomElement = { type: "paragraph"; children: CustomText[] };
 type CustomText = { text: string };
@@ -15,17 +16,13 @@ declare module "slate" {
   }
 }
 
-const initialValue: Descendant[] = [
-  {
-    type: "paragraph",
-    children: [{ text: "" }],
-  },
-];
-
-export function Editor({ className }: EditorProps) {
+export function Editor({ className, dateString }: EditorProps) {
   const [editor] = useState(() => withReact(createEditor()));
+
+  const { initialValue, handleChange } = useLocalStorageEntry({ dateString });
+
   return (
-    <Slate editor={editor} initialValue={initialValue}>
+    <Slate editor={editor} initialValue={initialValue} onChange={handleChange}>
       <Editable
         className={classNames("grow outline-none", className)}
         placeholder="Take a note..."
@@ -36,4 +33,5 @@ export function Editor({ className }: EditorProps) {
 
 type EditorProps = {
   className?: string;
+  dateString: string;
 };

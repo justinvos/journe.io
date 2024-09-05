@@ -4,14 +4,14 @@ import { MenuButton } from "./Menu/MenuButton";
 
 import { useMenuState } from "./Menu/useMenuState";
 
-export function Layout({ children }: LayoutProps) {
+export function Layout({ children, shouldHideMenu = false }: LayoutProps) {
   const { isMenuOpen, closeMenu, openMenu } = useMenuState();
 
   return (
     <>
-      <div className="h-screen flex flex-col p-8 items-center">
+      <div className="h-screen flex flex-col p-8">
         <div className="flex flex-row gap-4 w-full">
-          <MenuButton onClick={openMenu} />
+          {shouldHideMenu ? null : <MenuButton onClick={openMenu} />}
         </div>
         {children}
       </div>
@@ -20,4 +20,6 @@ export function Layout({ children }: LayoutProps) {
   );
 }
 
-type LayoutProps = React.PropsWithChildren<{}>;
+type LayoutProps = React.PropsWithChildren<{
+  shouldHideMenu?: boolean;
+}>;

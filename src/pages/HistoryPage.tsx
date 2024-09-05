@@ -4,21 +4,25 @@ import { Layout } from "../components/Layout";
 import {
   EntriesContext,
   EntriesProvider,
+  useEntryContext,
 } from "../contexts/EntriesContext/EntriesContext";
+import { EncryptionGate } from "../components/EncryptionGate";
 
 export function HistoryPage() {
   return (
-    <EntriesProvider>
+    <EncryptionGate>
       <Layout>
-        <h1>History</h1>
+        <h1 className="text-xl">History</h1>
         <EntriesList />
       </Layout>
-    </EntriesProvider>
+    </EncryptionGate>
   );
 }
 
 function EntriesList() {
-  const { entries } = React.useContext(EntriesContext)!;
+  // const { entries } = React.useContext(EntriesContext)!;
+  const { entries } = useEntryContext();
+  console.log("entries list", entries);
 
   if (entries == null) {
     return <p>Loading...</p>;

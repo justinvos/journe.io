@@ -1,14 +1,49 @@
 import { replaceOrAppend } from "radash";
-import React from "react";
-import { readLocalStorage, writeLocalStorage } from "./readLocalStorage";
+import React, { useEffect } from "react";
+import { loadEntries } from "./loadEntries";
 import { Entry } from "./Entry";
+import { readIsEncrypted, writeEntries } from "./localStorage";
+import { useUserContext } from "../UserContext/UserContext";
+import { encrypt } from "./encryption";
 
 export const EntriesContext = React.createContext<EntriesContextValue | null>(
   null
 );
 
 export function EntriesProvider({ children }: { children: React.ReactNode }) {
-  const [entries, setEntries] = React.useState<Entry[]>(readLocalStorage());
+  const { encryptionKey } = useUserContext();
+  // const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   if (!encryptionKey) {
+  //     navigate("/locked");
+  //   }
+  // }, []);
+
+  const [entries, setEntries] = React.useState<Entry[]>(
+    // loadEntries(encryptionKey) ?? []
+    []
+  );
+  const [loadingState, setLoadingState] =
+    React.useState<EntriesContextLoadingState>("initial");
+
+  function save() {
+    if (!readIsEncrypted()) {
+      writeEntries(JSON.stringify(entries));
+      return;
+    }
+
+    if (!encryptionKey) {
+      console.warn("No encryption key to encrypt entries");
+      return;
+    }
+
+    const encryptedEntries = encrypt({
+      entries,
+      key: encryptionKey,
+    });
+    writeEntries(encryptedEntries);
+  }
 
   function upsertEntry(updatedEntry: Entry) {
     const newEntries = replaceOrAppend(
@@ -17,7 +52,21 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
       (entry) => entry.date === updatedEntry.date
     );
     setEntries(newEntries);
-    writeLocalStorage(newEntries);
+
+    if (!readIsEncrypted()) {
+      writeEntries(JSON.stringify(entries));
+      return;
+    }
+
+    if (!encryptionKey) {
+      console.warn("No encryption key to encrypt entries");
+      return;
+    }
+    const encryptedEntries = encrypt({
+      entries: newEntries,
+      key: encryptionKey,
+    });
+    writeEntries(encryptedEntries);
   }
 
   function getEntry(dateString: string) {
@@ -28,10 +77,25 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
     return entries.find((entry) => entry.date === dateString) ?? null;
   }
 
+  function load(encryptionKey: string | null): void {
+    const loadedEntries = loadEntries(encryptionKey);
+    setEntries(loadedEntries ?? []);
+    setLoadingState("success");
+  }
+
+  useEffect(() => {
+    if (!readIsEncrypted()) {
+      load(null);
+    }
+  }, []);
+
   const value = {
     entries,
+    loadingState,
     upsertEntry,
     getEntry,
+    load,
+    save,
   };
 
   return (
@@ -43,4 +107,17 @@ type EntriesContextValue = {
   entries: Entry[] | null;
   upsertEntry: (entry: Entry) => void;
   getEntry: (dateString: string) => Entry | null;
+  load: (encryptionKey: string) => void;
+  loadingState: EntriesContextLoadingState;
+  save: () => void;
 };
+
+type EntriesContextLoadingState = "initial" | "loading" | "success" | "error";
+
+export function useEntryContext() {
+  const context = React.useContext(EntriesContext);
+  if (!context) {
+    throw new Error("useEntryContext must be used within a EntriesContext");
+  }
+  return context;
+}

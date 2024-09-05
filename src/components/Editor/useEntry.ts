@@ -1,7 +1,10 @@
 import { useContext } from "react";
 import { Descendant } from "slate";
 import { v4 as uuid } from "uuid";
-import { EntriesContext } from "../../contexts/EntriesContext/EntriesContext";
+import {
+  EntriesContext,
+  useEntryContext,
+} from "../../contexts/EntriesContext/EntriesContext";
 import { Entry } from "../../contexts/EntriesContext/Entry";
 
 const EMPTY_VALUE: Descendant[] = [
@@ -14,11 +17,7 @@ const EMPTY_VALUE: Descendant[] = [
 export function useEntry({
   dateString,
 }: UseLocalStorageEntryProps): UseEntryReturn {
-  const contextValue = useContext(EntriesContext);
-  if (contextValue === null) {
-    throw new Error("useEntry must be used within a EntriesProvider");
-  }
-  const { upsertEntry, getEntry } = contextValue;
+  const { upsertEntry, getEntry, loadingState } = useEntryContext();
 
   const entry = getEntry(dateString);
 
@@ -40,6 +39,7 @@ export function useEntry({
   return {
     initialValue: fallbackToEmptyContent(entry),
     handleChange,
+    isReady: loadingState === "success",
   };
 }
 
@@ -50,6 +50,7 @@ type UseLocalStorageEntryProps = {
 type UseEntryReturn = {
   initialValue: Descendant[];
   handleChange: (value: Descendant[]) => void;
+  isReady: boolean;
 };
 
 function fallbackToEmptyContent(entry: Entry | null): Descendant[] {

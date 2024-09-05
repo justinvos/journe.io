@@ -4,6 +4,9 @@ import { HomePage } from "./pages/HomePage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { SearchPage } from "./pages/SearchPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { EntriesProvider } from "./contexts/EntriesContext/EntriesContext";
+import { UserProvider } from "./contexts/UserContext/UserContext";
+import { LockedPage } from "./pages/LockedPage";
 
 const router = createBrowserRouter([
   {
@@ -22,8 +25,18 @@ const router = createBrowserRouter([
     path: "/search",
     element: <SearchPage />,
   },
+  {
+    path: "/locked",
+    element: <LockedPage />,
+  },
 ]);
 
 export function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <UserProvider>
+      <EntriesProvider>
+        <RouterProvider router={router} />
+      </EntriesProvider>
+    </UserProvider>
+  );
 }

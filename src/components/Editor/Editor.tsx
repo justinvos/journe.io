@@ -19,8 +19,12 @@ declare module "slate" {
 export function Editor({ className, dateString }: EditorProps) {
   const [editor] = useState(() => withReact(createEditor()));
 
-  const { initialValue, handleChange } = useEntry({ dateString });
+  const { initialValue, handleChange, isReady } = useEntry({ dateString });
   const initialValueRef = React.useRef(initialValue);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <Slate

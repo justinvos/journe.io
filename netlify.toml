@@ -2,9 +2,7 @@
   from = "/api/*"
   to = "https://tv6t3eqau4.execute-api.us-east-1.amazonaws.com/prod/:splat"
   status = 200
-  force = true
 
   from = "/*"
   to = "/index.html"
   status = 200
-  force = true

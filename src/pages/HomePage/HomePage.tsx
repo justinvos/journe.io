@@ -1,9 +1,10 @@
 import React from "react";
 import dayjs from "dayjs";
 import { useSearchParams } from "react-router-dom";
-import { Editor } from "../components/Editor/Editor";
-import { Layout } from "../components/Layout";
-import { EncryptionGate } from "../components/EncryptionGate";
+import { Editor } from "../../components/Editor/Editor";
+import { Layout } from "../../components/Layout/Layout";
+import { EncryptionGate } from "../../components/EncryptionGate";
+import { WelcomeDialog } from "./WelcomeDialog";
 
 export function HomePage() {
   const [searchParams] = useSearchParams();
@@ -18,6 +19,7 @@ export function HomePage() {
         <h1 className="mt-4 text-xl w-full max-w-[50rem]">{dateLabel}</h1>
         <Editor className="mt-2 w-full max-w-[50rem]" dateString={dateString} />
       </Layout>
+      <WelcomeDialog />
     </EncryptionGate>
   );
 }

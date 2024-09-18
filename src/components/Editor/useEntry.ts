@@ -1,11 +1,8 @@
-import { useContext } from "react";
 import { Descendant } from "slate";
 import { v4 as uuid } from "uuid";
-import {
-  EntriesContext,
-  useEntryContext,
-} from "../../contexts/EntriesContext/EntriesContext";
+import { useEntryContext } from "../../contexts/EntriesContext/EntriesContext";
 import { Entry } from "../../contexts/EntriesContext/Entry";
+import { useUserContext } from "../../contexts/UserContext/UserContext";
 
 const EMPTY_VALUE: Descendant[] = [
   {
@@ -17,22 +14,29 @@ const EMPTY_VALUE: Descendant[] = [
 export function useEntry({
   dateString,
 }: UseLocalStorageEntryProps): UseEntryReturn {
+  const { encryptionKey } = useUserContext();
   const { upsertEntry, getEntry, loadingState } = useEntryContext();
 
   const entry = getEntry(dateString);
 
   function handleChange(newContent: Descendant[]) {
     if (entry == null) {
-      upsertEntry({
+      const updatedEntry = {
         id: uuid(),
         content: newContent,
         date: dateString,
-      });
+      };
+      upsertEntry({ updatedEntry, encryptionKey });
       return;
     }
-    upsertEntry({
+
+    const updatedEntry = {
       ...entry,
       content: newContent,
+    };
+    upsertEntry({
+      updatedEntry,
+      encryptionKey,
     });
   }
 

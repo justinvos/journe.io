@@ -15,7 +15,7 @@ export function EncryptionGate({ children }: EncryptionGateProps) {
     if (needsEncryptionKey) {
       navigate("/locked");
     }
-  }, []);
+  }, [needsEncryptionKey]);
 
   if (needsEncryptionKey) {
     return null;

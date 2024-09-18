@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from "react";
 import { EncryptionGate } from "../components/EncryptionGate";
-import { Layout } from "../components/Layout";
+import { Layout } from "../components/Layout/Layout";
 import {
   readIsEncrypted,
   writeIsEncrypted,
@@ -31,7 +31,7 @@ export function SettingsPage() {
       setEncryptionKey(formState.encryptionKey);
     }
     writeIsEncrypted(formState.shouldEncrypt);
-    save();
+    save(formState.encryptionKey);
   }
 
   return (

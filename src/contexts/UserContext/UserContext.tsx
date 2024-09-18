@@ -4,7 +4,7 @@ export const UserContext = React.createContext<UserContextValue | null>(null);
 
 type UserContextValue = {
   encryptionKey: string | null;
-  setEncryptionKey: (encryptionKey: string) => void;
+  setEncryptionKey: (encryptionKey: string | null) => void;
 };
 
 export function UserProvider({ children }: React.PropsWithChildren<{}>) {

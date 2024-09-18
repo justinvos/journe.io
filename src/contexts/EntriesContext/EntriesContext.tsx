@@ -11,7 +11,6 @@ export const EntriesContext = React.createContext<EntriesContextValue | null>(
 );
 
 export function EntriesProvider({ children }: { children: React.ReactNode }) {
-  const { encryptionKey } = useUserContext();
   // const navigate = useNavigate();
 
   // useEffect(() => {
@@ -27,7 +26,7 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
   const [loadingState, setLoadingState] =
     React.useState<EntriesContextLoadingState>("initial");
 
-  function save() {
+  function save(encryptionKey: string) {
     if (!readIsEncrypted()) {
       writeEntries(JSON.stringify(entries));
       return;
@@ -45,7 +44,7 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
     writeEntries(encryptedEntries);
   }
 
-  function upsertEntry(updatedEntry: Entry) {
+  function upsertEntry({ encryptionKey, updatedEntry }: UpsertEntryParameter) {
     const newEntries = replaceOrAppend(
       entries,
       updatedEntry,
@@ -105,11 +104,11 @@ export function EntriesProvider({ children }: { children: React.ReactNode }) {
 
 type EntriesContextValue = {
   entries: Entry[] | null;
-  upsertEntry: (entry: Entry) => void;
+  upsertEntry: (param: UpsertEntryParameter) => void;
   getEntry: (dateString: string) => Entry | null;
   load: (encryptionKey: string) => void;
   loadingState: EntriesContextLoadingState;
-  save: () => void;
+  save: (encryptionKey: string) => void;
 };
 
 type EntriesContextLoadingState = "initial" | "loading" | "success" | "error";
@@ -121,3 +120,8 @@ export function useEntryContext() {
   }
   return context;
 }
+
+type UpsertEntryParameter = {
+  encryptionKey: string | null;
+  updatedEntry: Entry;
+};

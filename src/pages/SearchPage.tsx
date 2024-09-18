@@ -1,6 +1,6 @@
 import React from "react";
 import { EncryptionGate } from "../components/EncryptionGate";
-import { Layout } from "../components/Layout";
+import { Layout } from "../components/Layout/Layout";
 
 export function SearchPage() {
   return (
